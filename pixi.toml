@@ -1,0 +1,41 @@
+[project]
+name = "rag-api"
+version = "0.2.1"
+description = "RAG project with FAISS + FastAPI, pinned to Python 3.11"
+authors = ["Votre Nom <votre_email@example.com>"]
+platforms = ["osx-arm64"]
+channels = ["conda-forge", "pytorch", "apple"]
+
+[dependencies]
+# Choix d'une version stable de Python <=3.11
+python = "3.11.*"
+
+pip = "*"
+setuptools = "*"
+wheel = "*"
+cython = "*"
+
+# Laissez numpy en version libre ou éventuellement <1.24
+numpy = "*"
+
+pytorch = { channel = "pytorch", version = ">=2.1.0" }
+torchvision = { channel = "pytorch", version = ">=0.16.0" }
+torchaudio = { channel = "pytorch", version = ">=2.1.0" }
+
+# Installe FAISS depuis conda-forge (binaire précompilé)
+faiss-cpu = { channel = "conda-forge", version = ">=1.7.0" }
+
+numba = "*"
+rich = "*"
+[pypi-dependencies]
+# Haystack (farm-haystack >=1.26 ou haystack-ai>=2.8)
+farm-haystack = { version = ">=1.20.0", extras = ["file-conversion"] }
+
+sentence-transformers = "*"
+transformers = "*"
+python-magic = "*"
+python-dotenv = "*"
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "==1.4.51"
+accelerate  = "*"
