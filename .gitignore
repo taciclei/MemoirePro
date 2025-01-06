@@ -1,0 +1,26 @@
+# Environnements pixi
+.pixi
+*.egg-info
+
+# Environnements magic
+.magic
+
+# Fichiers de configuration de l'environnement
+.env
+
+# Dossiers de sortie
+output/
+faiss_index.json
+
+# Fichiers temporaires
+*.pyc
+__pycache__/
+*.log
+
+# Fichiers de sauvegarde
+*.bak
+*.tmp
+
+# Fichiers de test
+*.coverage
+*.pytest_cache/
