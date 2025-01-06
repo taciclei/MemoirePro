@@ -1,8 +1,43 @@
-# 🗺️ Roadmap MémoirePro
+<div align="center">
 
-## ✅ Fonctionnalités réalisées
+# 🚀 MémoirePro Roadmap 2025
 
-### Base du système
+<img src="docs/assets/header.webp" alt="MémoirePro Logo" width="800"/>
+
+[![Progress](https://progress-bar.dev/40/?title=Progression&width=400)](https://github.com/taciclei/MemoirePro)
+[![Status](https://img.shields.io/badge/Status-En%20Développement-green)](https://github.com/taciclei/MemoirePro)
+[![Last Update](https://img.shields.io/badge/Dernière%20Mise%20à%20Jour-6%20Janvier%202025-blue)](https://github.com/taciclei/MemoirePro)
+
+</div>
+
+## 🎯 Vision
+> *Créer une solution RAG innovante et performante pour la gestion intelligente des connaissances*
+
+<details open>
+<summary><h2>📊 État d'Avancement</h2></summary>
+
+### 🌟 Phase 1: Fondations (✅ Complété)
+```mermaid
+graph TD
+    A[Configuration] --> B[API FastAPI]
+    B --> C[FAISS Search]
+    C --> D[Optimisation M1/M2]
+    style A fill:#90EE90
+    style B fill:#90EE90
+    style C fill:#90EE90
+    style D fill:#90EE90
+```
+
+#### 🛠️ Réalisations Techniques
+| Fonctionnalité | État | Description |
+|:--------------:|:----:|:------------|
+| Configuration Pixi | ✅ | Environnement de développement optimisé |
+| API FastAPI | ✅ | Architecture REST performante |
+| FAISS Integration | ✅ | Recherche vectorielle efficace |
+| Multi-format | ✅ | Support PDF, DOCX, TXT |
+| PromptNode | ✅ | Configuration optimisée sans accelerate |
+
+### Tâches Réalisées
 - [x] Configuration du projet avec magic/pixi
 - [x] Mise en place de l'API FastAPI
 - [x] Intégration de FAISS pour la recherche vectorielle
@@ -11,71 +46,99 @@
 - [x] Optimisation pour Mac M1/M2 (MPS)
 - [x] Gestion des variables d'environnement
 - [x] Documentation de base (README.md)
-
-### API REST
 - [x] Endpoint d'indexation (/index)
 - [x] Endpoint de chargement (/load)
 - [x] Endpoint de requête (/query)
 - [x] Gestion des erreurs HTTP
 - [x] Validation des entrées avec Pydantic
 
-## 🚀 Fonctionnalités à venir
+</details>
 
-### 1. Amélioration de la recherche (Q1 2025)
-- [ ] Support de la recherche multilingue
-- [ ] Filtrage par métadonnées (date, type, auteur)
-- [ ] Recherche par similarité d'images
-- [ ] Amélioration du ranking des résultats
-- [ ] Support de requêtes booléennes complexes
+<details open>
+<summary><h2>🚀 Roadmap 2025</h2></summary>
 
-### 2. Optimisation des performances (Q2 2025)
-- [ ] Mise en cache des requêtes fréquentes
-- [ ] Compression des embeddings
-- [ ] Parallélisation du traitement des documents
-- [ ] Optimisation de la mémoire pour les grands corpus
-- [ ] Monitoring des performances avec Prometheus
+### Q1 2025 - Innovation
+```mermaid
+timeline
+    title Roadmap Q1 2025
+    MOCHI Integration : 🔥 Prioritaire
+    LangChain Integration : 🔥 Prioritaire
+    Recherche multilingue : 🚧 En développement
+    Prompts avancés : 📋 Planifié
+    Système de feedback : ⏳ À venir
+    Filtrage métadonnées : ⏳ À venir
+```
 
-### 3. Sécurité et authentification (Q2 2025)
-- [ ] Authentification JWT
-- [ ] Gestion des rôles et permissions
-- [ ] Rate limiting
-- [ ] Audit logs
-- [ ] Chiffrement des données sensibles
+### 🎨 Q2 2025 - Interface Utilisateur
+- [ ] Interface Web Moderne avec React/Next.js
+- [ ] Visualisation des données avec D3.js
+- [ ] Dashboard analytics en temps réel
+- [ ] Thème sombre/clair adaptatif
 
-### 4. Interface utilisateur (Q3 2025)
-- [ ] Dashboard d'administration
-- [ ] Interface de recherche Web
-- [ ] Visualisation des relations entre documents
-- [ ] Statistiques d'utilisation
-- [ ] Mode sombre/clair
+### ⚡ Q3 2025 - Performance & Scalabilité
+- [ ] API WebSocket pour temps réel
+- [ ] Système de plugins extensible
+- [ ] Intégration cloud (AWS/GCP)
+- [ ] Export multi-format avancé
 
-### 5. Intégration et extensibilité (Q3 2025)
-- [ ] API WebSocket pour les mises à jour en temps réel
-- [ ] Support de plugins
-- [ ] Intégration avec des systèmes de stockage cloud
-- [ ] Export des résultats (PDF, CSV, JSON)
-- [ ] API GraphQL
+### 🧠 Q4 2025 - Intelligence
+- [ ] Apprentissage actif & Adaptation
+- [ ] Clustering automatique des données
+- [ ] Détection de langue & Traduction
+- [ ] Génération de résumés intelligents
 
-### 6. Fonctionnalités avancées (Q4 2025)
-- [ ] Apprentissage actif pour améliorer les résultats
-- [ ] Clustering automatique des documents
-- [ ] Détection des langues
-- [ ] Génération de résumés
-- [ ] Extraction automatique de mots-clés
+</details>
 
-### 7. Déploiement et maintenance (Q4 2025)
-- [ ] Configuration Docker multi-stage
-- [ ] Scripts de backup automatiques
-- [ ] Tests de charge
-- [ ] Documentation API avec ReDoc
-- [ ] CI/CD avec GitHub Actions
+<details open>
+<summary><h2>🎤 Intégration MOCHI</h2></summary>
 
-## 📈 Métriques de succès
-- Performance : Temps de réponse < 200ms pour les requêtes
-- Précision : Score F1 > 0.85 pour les recherches
-- Scalabilité : Support jusqu'à 1M de documents
-- Disponibilité : Uptime de 99.9%
-- Satisfaction : Score utilisateur > 4.5/5
+### Interface Vocale Avancée
+- [ ] Recognition vocale multi-locuteurs
+- [ ] Synthèse vocale naturelle
+- [ ] Support de 5+ langues
+- [ ] Interface vocale contextuelle
+- [ ] Transcription en temps réel
+- [ ] Voix personnalisables
 
-## 🤝 Contribution
-Nous encourageons les contributions ! Consultez CONTRIBUTING.md pour les directives.
+</details>
+
+<details open>
+<summary><h2>🔗 Intégration LangChain</h2></summary>
+
+### Capacités Avancées
+- [ ] Chaînes LangChain optimisées
+- [ ] Agents IA autonomes
+- [ ] Prompts dynamiques
+- [ ] RAG amélioré
+
+</details>
+
+## 📈 Métriques de Succès
+| Métrique | Objectif | Status |
+|:---------|:---------|:------:|
+| Performance | < 500ms/requête | 🟡 |
+| Précision | > 90% | 🟢 |
+| Satisfaction | > 4.5/5 | 🟡 |
+
+## 🔄 Cycle de Développement
+```mermaid
+graph LR
+    A((Développement)) --> B((Test))
+    B --> C((Déploiement))
+    C --> D((Feedback))
+    D --> A
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+    style B fill:#bbf,stroke:#333,stroke-width:4px
+    style C fill:#bfb,stroke:#333,stroke-width:4px
+    style D fill:#fbf,stroke:#333,stroke-width:4px
+```
+
+---
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/taciclei/MemoirePro?style=social)](https://github.com/taciclei/MemoirePro)
+[![Twitter Follow](https://img.shields.io/twitter/follow/MemoirePro?style=social)](https://twitter.com/MemoirePro)
+
+**[Documentation](docs/README.md)** • **[Installation](docs/installation.md)** • **[Contribuer](CONTRIBUTING.md)**
+
+</div>

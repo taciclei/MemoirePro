@@ -11,7 +11,7 @@
 # Dossiers de sortie
 output/
 faiss_index.json
-
+models/
 # Fichiers temporaires
 *.pyc
 __pycache__/

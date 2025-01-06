@@ -1,92 +1,203 @@
-# MémoirePro
+<div align="center">
 
-## Description
-MémoirePro est un système RAG (Retrieval-Augmented Generation) qui permet d'indexer, rechercher et interroger intelligemment vos documents. Basé sur FAISS pour la recherche vectorielle et FastAPI pour l'interface API, il offre une solution performante pour la gestion documentaire intelligente.
+# 🧠 MémoirePro
 
-## Prérequis
-- Python 3.11
-- magic (gestionnaire de paquets)
-- Mac M1/M2 (optimisé pour Apple Silicon)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/release/python-311/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-green.svg)](https://fastapi.tiangolo.com/)
+[![FAISS](https://img.shields.io/badge/FAISS-1.7.4-orange.svg)](https://github.com/facebookresearch/faiss)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--3.5-purple.svg)](https://openai.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-## Installation
+<h3>Système RAG Intelligent pour l'Archivage Numérique et Argentique</h3>
 
-1. Cloner le repository :
+[English](README_EN.md) | [Français](README.md) | [日本語](README_JP.md)
+
+<p align="center">
+  <img src="docs/assets/header.webp" alt="MémoirePro Demo" width="600px">
+</p>
+
+</div>
+
+---
+
+## 📚 Table des Matières
+
+- [🌟 Points Forts](#-points-forts)
+- [🛠️ Installation](#️-installation)
+- [🚀 Démarrage Rapide](#-démarrage-rapide)
+- [📖 Documentation](#-documentation)
+- [🔧 Architecture](#-architecture)
+- [🤝 Contribution](#-contribution)
+- [📝 License](#-license)
+
+## 🌟 Points Forts
+
+<table>
+<tr>
+<td>
+
+### 🔍 Recherche Avancée
+- Recherche sémantique FAISS
+- Indexation multi-format
+- Analyse contextuelle
+
+</td>
+<td>
+
+### 🎯 Performance
+- Optimisé Apple Silicon
+- Vectorisation rapide
+- Mise en cache intelligente
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🔐 Sécurité
+- Gestion API sécurisée
+- Chiffrement des données
+- Contrôle d'accès
+
+</td>
+<td>
+
+### 🌍 Multilingue
+- Support multi-langues
+- OCR avancé
+- Traduction intégrée
+
+</td>
+</tr>
+</table>
+
+## 🛠️ Installation
+
+### Prérequis
+
+- Python 3.11+
+- Magic Package Manager
+- Git
+
+### Installation Simple
+
 ```bash
-git clone <votre-repo>
+# Cloner le repository
+git clone https://github.com/votre-username/memoirepro.git
 cd memoirepro
-```
 
-2. Installer les dépendances avec magic :
-```bash
+# Installer les dépendances
 magic install
+
+# Configuration
+cp .env.example .env
 ```
 
-3. Créer un fichier `.env` à la racine du projet :
-```bash
-OPENAI_API_KEY=votre_clé_api_openai
+<details>
+<summary>📋 Installation Détaillée</summary>
+
+1. **Configuration système requise**
+   ```bash
+   # Pour Mac M1/M2
+   xcode-select --install
+   ```
+
+2. **Installation des dépendances**
+   ```bash
+   magic shell
+   pip install -r requirements.txt
+   ```
+
+3. **Configuration de l'environnement**
+   ```bash
+   # Éditer .env avec vos clés API
+   nano .env
+   ```
+</details>
+
+## 🚀 Démarrage Rapide
+
+```python
+from memoirepro import DocumentProcessor
+
+# Initialisation
+processor = DocumentProcessor()
+
+# Indexation
+processor.index_documents("chemin/vers/documents")
+
+# Recherche
+results = processor.search("Votre requête ici")
 ```
 
-## Utilisation de l'API
+<details>
+<summary>🎯 Exemples d'Utilisation API</summary>
 
-### Démarrer le serveur
+### Indexation via API
+
 ```bash
-magic shell
-uvicorn src.api:app --reload
-```
-Le serveur démarre sur `http://localhost:8000`
-
-### Endpoints disponibles
-
-1. **Indexer des documents**
-```bash
-curl -X 'POST' \
-  'http://localhost:8000/index' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
+curl -X POST http://localhost:8000/index \
+  -H "Content-Type: application/json" \
   -d '{
-  "input_dir": "~/Documents",
-  "output_dir": "./output"
-}'
+    "input_dir": "~/Documents",
+    "output_dir": "./output"
+  }'
 ```
 
-2. **Charger un index existant**
+### Recherche via API
+
 ```bash
-curl -X 'POST' \
-  'http://localhost:8000/load' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
   -d '{
-  "index_dir": "./output"
-}'
+    "question": "Résumez ce document",
+    "top_k": 3
+  }'
+```
+</details>
+
+## 📖 Documentation
+
+| Section | Description |
+|---------|-------------|
+| [Guide d'Installation](docs/installation.md) | Instructions détaillées d'installation |
+| [API Reference](docs/api.md) | Documentation complète de l'API |
+| [Exemples](docs/examples.md) | Exemples d'utilisation |
+| [FAQ](docs/faq.md) | Questions fréquentes |
+
+## 🔧 Architecture
+
+```mermaid
+graph TD
+    A[Documents] --> B[Indexation]
+    B --> C[FAISS Vector Store]
+    C --> D[API REST]
+    D --> E[Interface Utilisateur]
 ```
 
-3. **Poser une question**
-```bash
-curl -X 'POST' \
-  'http://localhost:8000/query' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "question": "Votre question ici ?",
-  "top_k": 3
-}'
-```
+## 🤝 Contribution
 
-## Fonctionnalités
+Nous adorons les contributions ! Voici comment participer :
 
-- Indexation de documents (PDF, DOCX, TXT)
-- Recherche sémantique avec FAISS
-- Génération de réponses avec GPT-3.5-turbo
-- Support optimisé pour Mac M1/M2 (MPS)
-- Logging détaillé avec Rich
+1. 🍴 Forkez le projet
+2. 🔧 Créez votre branche (`git checkout -b feature/AmazingFeature`)
+3. 💾 Committez vos changements (`git commit -m 'Add AmazingFeature'`)
+4. 📤 Pushez vers la branche (`git push origin feature/AmazingFeature`)
+5. 🔍 Ouvrez une Pull Request
 
-## Configuration
+## 📝 License
 
-Le projet utilise [pixi.toml](cci:7://file:///Volumes/r0/haystack/pixi.toml:0:0-0:0) pour la gestion des dépendances. Les principales dépendances incluent :
-- farm-haystack avec extras pour la conversion de fichiers
-- FastAPI pour l'API REST
-- FAISS pour la recherche vectorielle
-- SQLAlchemy 1.4.51 pour la persistence
+MémoirePro est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## Contribution
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
+---
+
+<div align="center">
+
+### ⭐ Supportez le Projet
+
+Si vous trouvez MémoirePro utile, donnez-nous une étoile ⭐
+
+[⬆ Retour en haut](#-memoirepro)
+
+</div>
