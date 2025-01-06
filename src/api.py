@@ -17,6 +17,9 @@ from haystack.schema import Document
 from rich.console import Console
 from rich.logging import RichHandler
 from dotenv import load_dotenv
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from ctransformers import AutoModelForCausalLM
+from haystack.nodes.base import BaseComponent
 
 # ---------------------------------------------------------------------------
 # 1) Chargement des variables d'environnement
@@ -87,7 +90,7 @@ class LoadRequest(BaseModel):
 if torch.cuda.is_available():
     DEVICE = "cuda"
 elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-    DEVICE = "mps"
+    DEVICE = "cpu"
 else:
     DEVICE = "cpu"
 
@@ -100,26 +103,13 @@ class RAGEngine:
     """Moteur RAG (Retrieval-Augmented Generation) utilisant Haystack."""
 
     def __init__(self):
-        """Initialise le moteur RAG avec les composants nécessaires."""
+        """Initialise le moteur RAG."""
         self.document_store = None
         self.retriever = None
         self.prompt_node = None
-        self.pipeline = None
-
-        # IMPORTANT : 8 backslashes (\\\\\\\\) pour éviter le SyntaxError
-        # Finalement, dans le code source Python, 'delimiter='\\\\\\\\n\\\\\\\\n''
-        # Produira assez d'échappements pour le double parsing interne de Haystack
-        self.template = PromptTemplate(
-            prompt=(
-                "Réponds à la question en te basant uniquement sur le contexte fourni.\n"
-                "Si l'information n'est pas dans le contexte, dis-le explicitement.\n\n"
-                "Contexte:\n{{join(documents, delimiter='\\\\n\\\\n', max_length=1000)}}\n\n"
-                "Question: {{query}}\n\n"
-                "Réponse concise:"
-            )
-        )
-
-        logger.debug("RAGEngine instancié.")
+        self.pipeline = Pipeline()  # Initialisation du pipeline dès la création
+        self.template = """Réponds à la question en te basant uniquement sur le contexte fourni.\nContexte: {context}\nQuestion: {query}\nRéponse:"""
+        logger.info("[INIT] Moteur RAG initialisé.")
 
     def _load_documents(self, input_dir: str) -> List[Document]:
         """
@@ -195,7 +185,8 @@ class RAGEngine:
                 embedding_dim=384,
                 return_embedding=True,
                 similarity="cosine",
-                faiss_index_factory_str="Flat"
+                faiss_index_factory_str="Flat",
+                validate_index_sync=False
             )
 
             # Création du retriever
@@ -267,7 +258,7 @@ class RAGEngine:
                 sql_url=f"sqlite:///{db_path}",
                 embedding_dim=384,
                 similarity="cosine",
-                validate_index_sync=True
+                validate_index_sync=False
             )
 
             logger.info(f"[LOAD] Chargement de l'index FAISS depuis {faiss_index_path}...")
@@ -283,19 +274,12 @@ class RAGEngine:
                 document_store=self.document_store,
                 query_embedding_model="sentence-transformers/all-MiniLM-L6-v2",
                 passage_embedding_model="sentence-transformers/all-MiniLM-L6-v2",
-                use_gpu=(DEVICE != "cpu")
+                use_gpu=False
             )
 
-            logger.info("[LOAD] Initialisation du PromptNode...")
-            self.prompt_node = PromptNode(
-                model_name_or_path="gpt-3.5-turbo",
-                api_key=os.getenv("OPENAI_API_KEY"),
-                default_prompt_template=self.template,
-                max_length=2000
-            )
+            self._initialize_prompt_node()
 
             logger.info("[LOAD] Construction du pipeline RAG...")
-            self.pipeline = Pipeline()
             self.pipeline.add_node(component=self.retriever, name="Retriever", inputs=["Query"])
             self.pipeline.add_node(component=self.prompt_node, name="PromptNode", inputs=["Retriever"])
 
@@ -308,18 +292,90 @@ class RAGEngine:
                 detail=f"Erreur lors du chargement : {str(e)}"
             )
 
+    class GGUFPromptNode(BaseComponent):
+        outgoing_edges = 1
+        
+        def __init__(self, model_path, template=None, model_type="mistral", gpu_layers=50):
+            super().__init__()
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                model_type=model_type,
+                gpu_layers=gpu_layers
+            )
+            self.template = str(template) if template else (
+                "En te basant sur le contexte suivant, réponds à la question.\n\n"
+                "Contexte:\n{context}\n\n"
+                "Question: {query}\n\n"
+                "Réponse:"
+            )
+
+        def run(self, query: str = None, documents: List[Document] = None, **kwargs):
+            try:
+                # Formatage du contexte à partir des documents
+                context = "\n".join([doc.content for doc in documents]) if documents else ""
+                
+                # Formatage du prompt en utilisant str.format()
+                formatted_prompt = self.template.format(
+                    context=context,
+                    query=query
+                )
+                
+                # Génération de la réponse
+                response = self.model(formatted_prompt, max_new_tokens=512)
+                
+                return {
+                    "query": query,
+                    "answers": [{"answer": response}],
+                    "documents": documents
+                }, "output_1"  # Le second élément est le stream_id requis par Haystack
+            except Exception as e:
+                logger.error(f"Erreur lors du formatage du prompt ou de la génération : {str(e)}")
+                raise
+
+        def run_batch(self, *args, **kwargs):
+            raise NotImplementedError("Cette méthode n'est pas implémentée pour GGUFPromptNode")
+
+    def _initialize_prompt_node(self):
+        """Initialise le PromptNode en fonction de la configuration"""
+        MODEL_TYPE = os.getenv("MODEL_TYPE", "local")
+        MODEL_PATH = os.getenv("MODEL_PATH")
+
+        if not MODEL_PATH:
+            raise ValueError("MODEL_PATH n'est pas défini dans le fichier .env")
+
+        if MODEL_TYPE == "local":
+            try:
+                self.prompt_node = self.GGUFPromptNode(
+                    model_path=MODEL_PATH,
+                    template=self.template,
+                    model_type="mistral",
+                    gpu_layers=50
+                )
+                logger.info(f"[LOAD] Modèle GGUF chargé avec succès: {MODEL_PATH}")
+            except Exception as e:
+                logger.error(f"Erreur lors de l'initialisation du modèle GGUF : {str(e)}")
+                raise
+        elif MODEL_TYPE == "openai":
+            openai_key = os.getenv("OPENAI_API_KEY")
+            if not openai_key:
+                raise ValueError("OPENAI_API_KEY n'est pas défini dans le fichier .env")
+            self.prompt_node = PromptNode(
+                model_name_or_path="text-davinci-003",
+                api_key=openai_key,
+                default_prompt_template=self.template,
+                max_length=2000
+            )
+        else:
+            raise ValueError(f"Type de modèle non supporté: {MODEL_TYPE}")
+
     def query(self, question: str, top_k: Optional[int] = 3) -> Dict[str, Any]:
         """
         Interroge le système RAG via un pipeline (Retriever + PromptNode).
-        
-        Args:
-            question: Question à poser.
-            top_k: Nombre de documents à récupérer.
         """
-        if not self.pipeline:
+        if not self.pipeline or not self.retriever or not self.prompt_node:
             raise HTTPException(
                 status_code=500,
-                detail="Pipeline non initialisé. Appelez d'abord load_index()."
+                detail="Pipeline non complètement initialisé. Appelez d'abord load_index()."
             )
 
         try:
@@ -327,28 +383,25 @@ class RAGEngine:
             result = self.pipeline.run(
                 query=question,
                 params={
-                    "Retriever": {"top_k": top_k},
-                    "PromptNode": {"generation_kwargs": {"max_new_tokens": 200}}
+                    "Retriever": {"top_k": top_k}
                 }
             )
-
-            # On récupère la première réponse
-            answers = result.get("answers", [])
-            answer = answers[0].answer if answers else ""
-
-            logger.debug(f"[QUERY] answer={answer}")
-
+            
+            logger.info("[QUERY] Réponse générée avec succès")
             return {
-                "answer": answer,
-                "documents": len(result.get("documents", [])),
-                "metadata": {
-                    "model": "gpt-3.5-turbo",
-                    "top_k": top_k
-                }
+                "query": question,
+                "answer": result["answers"][0].answer if result.get("answers") else "",
+                "documents": [
+                    {
+                        "content": doc.content,
+                        "meta": doc.meta
+                    }
+                    for doc in result.get("documents", [])
+                ]
             }
-
+            
         except Exception as e:
-            logger.error("[QUERY] Erreur lors de la requête", exc_info=True)
+            logger.error(f"[QUERY] Erreur lors de la requête", exc_info=True)
             raise HTTPException(
                 status_code=500,
                 detail=f"Erreur lors de la requête : {str(e)}"
